@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ContactList from './components/ContactList';
 import SearchBox from './components/SearchBox';
 import ContactForm from './components/ContactForm';
@@ -23,15 +23,12 @@ function App() {
       return initialContacts;
     }
   });
-  const [filteredContacts, setFilteredContacts] = useState(contacts);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const searchContact = (event) => {
     const value = event.target.value;
-    const filter = contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(value.toLowerCase()),
-    );
 
-    setFilteredContacts(filter);
+    setSearchTerm(value);
   };
 
   const submitContactForm = async (data) => {
@@ -39,17 +36,21 @@ function App() {
     const updatedContacts = [...contacts, { id, ...data }];
 
     setContacts(updatedContacts);
-    setFilteredContacts(updatedContacts);
-    localStorage.setItem('contacts', JSON.stringify(updatedContacts));
   };
 
   const deleteContact = (id) => () => {
     const updatedContacts = contacts.filter((contact) => contact.id !== id);
 
     setContacts(updatedContacts);
-    setFilteredContacts(updatedContacts);
-    localStorage.setItem('contacts', JSON.stringify(updatedContacts));
   };
+
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+  
+  const filteredContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   return (
     <div>
